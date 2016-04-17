@@ -14,6 +14,7 @@ languages to reap the benefits as well.
 To play with it, in one terminal run.
 
 .. code-block:: bash
+
   python shadeapi/__init__.py
 
 The swagger docs will be at http://localhost:5000. The API currently takes
@@ -21,6 +22,7 @@ a fake auth key which is `deadbeefdeadbeefdeadbeefdeadbeef`. If you want to
 do things with it, you can just curl.
 
 .. code-block:: bash
+
   curl -X GET -H 'Shade-API-Key: deadbeefdeadbeefdeadbeefdeadbeef' --header 'Accept: application/json' 'http://localhost:5000/clouds'
 
 * Documentation: http://docs.openstack.org/developer/shadeapi
