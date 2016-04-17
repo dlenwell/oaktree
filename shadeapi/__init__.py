@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
+
 import flask
 import flask_restplus
 from flask.ext import login
@@ -72,15 +74,15 @@ def make_list_resource(name):
                 required=True)
     class RestResource(flask_restplus.Resource):
         @login.login_required
-        def get(self, cloud='vexxhost', region=None):
+        def get(self, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args
             if filters:
                 search_key = name.replace('list', 'search')
                 return getattr(cloud_obj, search_key)(
-                    filters=filters.to_dict())
+                    filters=filters.to_dict(), **kwargs)
             else:
-                return getattr(cloud_obj, name)()
+                return getattr(cloud_obj, name)(**kwargs)
     return RestResource
 
 
@@ -100,6 +102,28 @@ def make_get_resource(name):
     return RestResource
 
 
+def get_required_args(list_key):
+    list_obj = getattr(shade.OpenStackCloud, list_key)
+    argspec = inspect.getargspec(list_obj)
+    default_len = len(argspec.defaults) if argspec.defaults else 0
+    return argspec.args[1:len(argspec.args) - default_len]
+
+
+def get_rest_args(name, req_args):
+    args = []
+    for arg in req_args:
+        args.append(arg)
+        args.append("<string:{arg}>".format(arg=arg))
+    args.append(name)
+    res = "/".join(args)
+
+    return [
+        '/{res}'.format(res=res),
+        '/cloud/<string:cloud>/{res}'.format(res=res),
+        '/cloud/<string:cloud>/region/<string:region>/{res}'.format(res=res),
+    ]
+
+
 for list_key in CLOUD_API:
     if not list_key.startswith('list_'):
         continue
@@ -107,11 +131,9 @@ for list_key in CLOUD_API:
     single_name = name[:-1]
     res_class = make_list_resource(list_key)
 
-    api.add_resource(
-        res_class, '/{res}'.format(res=name),
-        '/cloud/<string:cloud>/{res}'.format(res=name),
-        '/cloud/<string:cloud>/region/<string:region>/{res}'.format(res=name),
-        endpoint=list_key)
+    req_args = get_required_args(list_key)
+    rest_args = get_rest_args(name, req_args)
+    api.add_resource(res_class, endpoint=list_key, *rest_args)
 
     get_key = 'get_{name}'.format(name=single_name)
 
