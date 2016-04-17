@@ -16,6 +16,7 @@
 import flask
 import flask_restplus
 from flask.ext import login
+import os_client_config
 import shade
 
 from shadeapi.auth import authentication
@@ -26,6 +27,7 @@ all_clouds = {}
 CLOUD_API = shade.OpenStackCloud.__dict__.keys()
 C_PREFIX = '/cloud/<string:cloud>'
 CR_PREFIX = '/cloud/<string:cloud>/region/<string:region>'
+openstack_config = os_client_config.OpenStackConfig()
 
 authentication.login_manager.init_app(app)
 
@@ -41,14 +43,22 @@ def _get_cloud(cloud, region):
     return all_clouds[key]
 
 
-class Config(flask_restplus.Resource):
+class CloudConfig(flask_restplus.Resource):
     @login.login_required
-    def get(self, cloud='vexxhost', region=None):
-        return cloud.cloud_config.config
+    def get(self, cloud=None, region=None):
+        if not cloud and not region:
+            return [
+                config.config for config in openstack_config.get_all_clouds()]
+        if not region:
+            return [
+                config.config for config in openstack_config.get_all_clouds()
+                if config.name == cloud]
+        return openstack_config.get_one_cloud(
+            cloud=cloud, region_name=region).config
 api.add_resource(
-    Config, '/config',
-    '/cloud/<string:cloud>/config',
-    '/cloud/<string:cloud>/region/<string:region>/config',
+    CloudConfig, '/clouds',
+    '/cloud/<string:cloud>',
+    '/cloud/<string:cloud>/region/<string:region>',
     endpoint='config')
 
 
