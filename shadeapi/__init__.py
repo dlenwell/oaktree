@@ -49,9 +49,15 @@ api.add_resource(
 
 def make_list_resource(name):
     class RestResource(flask_restplus.Resource):
-        def get(self, cloud='vexxhost', region=None, **kwargs):
+        def get(self, cloud='vexxhost', region=None):
             cloud_obj = _get_cloud(cloud, region)
-            return getattr(cloud_obj, name)()
+            filters = flask.request.args
+            if filters:
+                search_key = name.replace('list', 'search')
+                return getattr(cloud_obj, search_key)(
+                    filters=filters.to_dict())
+            else:
+                return getattr(cloud_obj, name)()
     return RestResource
 
 
@@ -59,7 +65,11 @@ def make_get_resource(name):
     class RestResource(flask_restplus.Resource):
         def get(self, name_or_id, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _get_cloud(cloud, region)
-            return getattr(cloud_obj, name)(name_or_id)
+            filters = flask.request.args
+            get_method = getattr(cloud_obj, name)
+            if filters:
+                return get_method(name_or_id, filters=filters.to_dict())
+            return get_method(name_or_id)
     return RestResource
 
 
