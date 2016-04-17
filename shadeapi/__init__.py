@@ -15,7 +15,10 @@
 
 import flask
 import flask_restplus
+from flask.ext import login
 import shade
+
+from shadeapi.auth import authentication
 
 app = flask.Flask(__name__)
 api = flask_restplus.Api(app)
@@ -24,6 +27,7 @@ CLOUD_API = shade.OpenStackCloud.__dict__.keys()
 C_PREFIX = '/cloud/<string:cloud>'
 CR_PREFIX = '/cloud/<string:cloud>/region/<string:region>'
 
+authentication.login_manager.init_app(app)
 
 def _make_cloud_key(cloud, region):
     return "{cloud}:{region}".format(cloud=cloud, region=region)
@@ -38,6 +42,7 @@ def _get_cloud(cloud, region):
 
 
 class Config(flask_restplus.Resource):
+    @login.login_required
     def get(self, cloud='vexxhost', region=None):
         return cloud.cloud_config.config
 api.add_resource(
@@ -49,7 +54,8 @@ api.add_resource(
 
 def make_list_resource(name):
     class RestResource(flask_restplus.Resource):
-        def get(self, cloud='vexxhost', region=None):
+        @login.login_required
+        def get(self, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args
             if filters:
@@ -63,6 +69,7 @@ def make_list_resource(name):
 
 def make_get_resource(name):
     class RestResource(flask_restplus.Resource):
+        @login.login_required
         def get(self, name_or_id, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args
