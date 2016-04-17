@@ -58,7 +58,7 @@ class ShadeAPIUser(object):
 @LOGIN_MANAGER.request_loader
 def load_user_from_request(request):
     api_key = request.headers.get('Shade-API-Key')
-    # TODO: Lookup User Based on API Key
+    # TODO(morgan): Lookup User Based on API Key
     # NOTE: This will use fernet instead of UUID long term.
     try:
         key = uuid.UUID(hex=api_key)

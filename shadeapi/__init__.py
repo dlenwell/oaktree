@@ -16,8 +16,8 @@
 import inspect
 
 import flask
-import flask_restplus
 from flask.ext import login
+import flask_restplus
 import os_client_config
 import shade
 
