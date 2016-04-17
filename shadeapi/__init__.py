@@ -55,7 +55,7 @@ api.add_resource(
 def make_list_resource(name):
     class RestResource(flask_restplus.Resource):
         @login.login_required
-        def get(self, cloud='vexxhost', region=None, **kwargs):
+        def get(self, cloud='vexxhost', region=None):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args
             if filters:
