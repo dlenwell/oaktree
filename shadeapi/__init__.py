@@ -21,13 +21,20 @@ app = flask.Flask(__name__)
 api = flask_restplus.Api(app)
 all_clouds = {}
 CLOUD_API = shade.OpenStackCloud.__dict__.keys()
+C_PREFIX = '/cloud/<string:cloud>'
+CR_PREFIX = '/cloud/<string:cloud>/region/<string:region>'
+
+
+def _make_cloud_key(cloud, region):
+    return "{cloud}:{region}".format(cloud=cloud, region=region)
 
 
 def _get_cloud(cloud, region):
-    if cloud not in all_clouds:
-        all_clouds[cloud] = shade.openstack_cloud(
-            cloud=cloud, debug=True)
-    return all_clouds[cloud]
+    key = _make_cloud_key(cloud, region)
+    if key not in all_clouds:
+        all_clouds[key] = shade.openstack_cloud(
+            cloud=cloud, region_name=region, debug=True)
+    return all_clouds[key]
 
 
 class Config(flask_restplus.Resource):
@@ -51,10 +58,8 @@ def make_list_resource(name):
 def make_get_resource(name):
     class RestResource(flask_restplus.Resource):
         def get(self, name_or_id, cloud='vexxhost', region=None, **kwargs):
-            if cloud not in all_clouds:
-                all_clouds[cloud] = shade.openstack_cloud(
-                    cloud=cloud, debug=True)
-            return getattr(all_clouds[cloud], name)(name_or_id)
+            cloud_obj = _get_cloud(cloud, region)
+            return getattr(cloud_obj, name)(name_or_id)
     return RestResource
 
 
@@ -78,10 +83,10 @@ for list_key in CLOUD_API:
         api.add_resource(
             get_class,
             '/{res}/<string:name_or_id>'.format(res=single_name),
-            '/cloud/<string:cloud>/{res}/<string:name_or_id>'.format(
-                res=single_name),
-            '/cloud/<string:cloud>/region/<string:region>/{res}'.format(
-                res=single_name),
+            '{prefix}/{res}/<string:name_or_id>'.format(
+                prefix=C_PREFIX, res=single_name),
+            '{prefix}/{res}/<string:name_or_id>'.format(
+                prefix=CR_PREFIX, res=single_name),
             endpoint=get_key)
 
 if __name__ == '__main__':
