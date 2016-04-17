@@ -44,7 +44,6 @@ def _get_cloud(cloud, region):
 
 
 class CloudConfig(flask_restplus.Resource):
-    @login.login_required
     def get(self, cloud=None, region=None):
         if not cloud and not region:
             return [
@@ -64,7 +63,6 @@ api.add_resource(
 
 def make_list_resource(name):
     class RestResource(flask_restplus.Resource):
-        @login.login_required
         def get(self, cloud='vexxhost', region=None):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args
@@ -79,7 +77,6 @@ def make_list_resource(name):
 
 def make_get_resource(name):
     class RestResource(flask_restplus.Resource):
-        @login.login_required
         def get(self, name_or_id, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _get_cloud(cloud, region)
             filters = flask.request.args

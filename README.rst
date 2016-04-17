@@ -2,18 +2,27 @@
 shadeapi
 ===============================
 
-Sane User-oriented API for OpenStack
+Sane User-oriented REST API for OpenStack
 
-Please feel here a long description which must be at least 3 lines wrapped on
-80 cols, so that distribution package maintainers can use it in their packages.
-Note that this is a hard requirement.
+shadeapi is a REST interface for interacting with OpenStack clouds that is
+inherently interoperable and multi-cloud aware. It is based on the python
+shade library, which grew all of the logic needed to interact with OpenStack
+clouds and to work around differences in vendor deployment choices. Rather
+than keep all of that love in Python Library form, shadeapi allows othre
+languages to reap the benefits as well.
 
-* Free software: Apache license
+To play with it, in one terminal run.
+
+.. code-block:: bash
+  python shadeapi/__init__.py
+
+The swagger docs will be at http://localhost:5000. The API currently takes
+a fake auth key which is `deadbeefdeadbeefdeadbeefdeadbeef`. If you want to
+do things with it, you can just curl.
+
+.. code-block:: bash
+  curl -X GET -H 'Shade-API-Key: deadbeefdeadbeefdeadbeefdeadbeef' --header 'Accept: application/json' 'http://localhost:5000/clouds'
+
 * Documentation: http://docs.openstack.org/developer/shadeapi
 * Source: http://git.openstack.org/cgit/openstack/shadeapi
 * Bugs: http://bugs.launchpad.net/shadeapi
-
-Features
---------
-
-* TODO
