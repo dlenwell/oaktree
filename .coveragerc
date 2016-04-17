@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = shadeapi
+omit = shadeapi/openstack/*
+
+[report]
+ignore_errors = True
