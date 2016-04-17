@@ -1,19 +1,38 @@
-# -*- coding: utf-8 -*-
+from flask import Flask
+from flask_restplus import Resource, Api
 
-# Licensed under the Apache License, Version 2.0 (the "License"); you may
-# not use this file except in compliance with the License. You may obtain
-# a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-# License for the specific language governing permissions and limitations
-# under the License.
+import shade
 
-import pbr.version
+app = Flask(__name__)
+api = Api(app)
+all_clouds = {}
 
 
-__version__ = pbr.version.VersionInfo(
-    'shadeapi').version_string()
+class Config(Resource):
+    def get(self):
+        return cloud.cloud_config.config
+
+def make_resource(name):
+    class RestResource(Resource):
+        def get(self, cloud='vexxhost', region=None, **kwargs):
+            if cloud not in all_clouds:
+                all_clouds[cloud] = shade.openstack_cloud(
+                    cloud=cloud, debug=True)
+            return getattr(all_clouds[cloud], name)()
+    return RestResource
+
+for f in shade.OpenStackCloud.__dict__.keys():
+    if not f.startswith('list_'):
+        continue
+    name = f[5:]
+    res_class = make_resource(f)
+
+    api.add_resource(
+        res_class, '/{res}'.format(res=name),
+        '/cloud/<string:cloud>/{res}'.format(res=name),
+        '/cloud/<string:cloud>/region/<string:region>/{res}'.format(res=name),
+        endpoint=f)
+
+api.add_resource(Config, '/config')
+if __name__ == '__main__':
+    app.run(debug=True)
