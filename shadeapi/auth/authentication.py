@@ -17,8 +17,18 @@ import uuid
 
 from flask.ext import login
 
+API_KEY_HEADER = 'Shade-API-Key'
+API_KEY_HEADER_DESC = 'APIKey Auth Header: 16bytes HEX'
+LOGIN_MANAGER = login.LoginManager()
 
-login_manager = login.LoginManager()
+
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': API_KEY_HEADER
+    }
+}
 
 
 class ShadeAPIUser(object):
@@ -42,12 +52,14 @@ class ShadeAPIUser(object):
         return False
 
     def get_id(self):
-        return self.key.hex
+        return self.key
 
-@login_manager.request_loader
+
+@LOGIN_MANAGER.request_loader
 def load_user_from_request(request):
     api_key = request.headers.get('Shade-API-Key')
     # TODO: Lookup User Based on API Key
+    # NOTE: This will use fernet instead of UUID long term.
     try:
         key = uuid.UUID(hex=api_key)
         return ShadeAPIUser(key=key)
