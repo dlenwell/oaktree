@@ -4,9 +4,9 @@ Installation
 
 At the command line::
 
-    $ pip install shadeapi
+    $ pip install oaktree
 
 Or, if you have virtualenvwrapper installed::
 
-    $ mkvirtualenv shadeapi
-    $ pip install shadeapi
+    $ mkvirtualenv oaktree
+    $ pip install oaktree

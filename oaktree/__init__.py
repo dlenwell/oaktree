@@ -21,7 +21,7 @@ import flask_restplus
 import os_client_config
 import shade
 
-from shadeapi.auth import authentication
+from oaktree.auth import authentication
 
 
 app = flask.Flask(__name__)

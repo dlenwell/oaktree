@@ -13,13 +13,13 @@
 # under the License.
 
 """
-test_shadeapi
+test_oaktree
 ----------------------------------
 
-Tests for `shadeapi` module.
+Tests for `oaktree` module.
 """
 
-from shadeapi.tests import base
+from oaktree.tests import base
 
 
 class TestShadeapi(base.TestCase):

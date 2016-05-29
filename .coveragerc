@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = shadeapi
-omit = shadeapi/openstack/*
+source = oaktree
+omit = oaktree/openstack/*
 
 [report]
 ignore_errors = True

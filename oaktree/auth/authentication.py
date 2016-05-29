@@ -17,7 +17,7 @@ import uuid
 
 from flask.ext import login
 
-API_KEY_HEADER = 'Shade-API-Key'
+API_KEY_HEADER = 'Oaktree-API-Key'
 API_KEY_HEADER_DESC = 'APIKey Auth Header: 16bytes HEX'
 LOGIN_MANAGER = login.LoginManager()
 
@@ -57,7 +57,7 @@ class ShadeAPIUser(object):
 
 @LOGIN_MANAGER.request_loader
 def load_user_from_request(request):
-    api_key = request.headers.get('Shade-API-Key')
+    api_key = request.headers.get('Oaktree-API-Key')
     # TODO(morgan): Lookup User Based on API Key
     # NOTE: This will use fernet instead of UUID long term.
     try:

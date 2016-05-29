@@ -2,6 +2,6 @@
 Usage
 ========
 
-To use shadeapi in a project::
+To use oaktree in a project::
 
-    import shadeapi
+    import oaktree
