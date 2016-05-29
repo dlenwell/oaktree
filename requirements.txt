@@ -5,4 +5,5 @@
 pbr>=1.6
 Babel>=1.3
 shade
+flask-restplus
 Flask-Login
