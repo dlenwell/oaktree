@@ -27,6 +27,7 @@ from oaktree import _clouds
 from oaktree.rpc import oaktree_pb2
 
 _BOOL_TYPES = (FieldDescriptor.TYPE_BOOL,)
+_ENUM_TYPES = (FieldDescriptor.TYPE_ENUM, )
 _STR_TYPES = (FieldDescriptor.TYPE_STRING, )
 _INT_TYPES = (
     FieldDescriptor.TYPE_FIXED32, FieldDescriptor.TYPE_FIXED64,
@@ -40,9 +41,10 @@ _FLOAT_TYPES = (
 )
 _FIELDS_TO_STRIP = ('request_ids', 'HUMAN_ID', 'NAME_ATTR', 'human_id')
 
+
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-# Skipping bytes and enum for now
+# Skipping bytes for now
 
 def _get_cloud(request):
     return _clouds._get_cloud(
@@ -64,6 +66,8 @@ def convert_for_field(value, field):
         return int(value)
     elif field.type in _FLOAT_TYPES:
         return float(value)
+    elif field.type in _ENUM_TYPES:
+        return field.enum_type.values_by_name[value].number
 
 
 def convert_munch_to_pb(munch, pb):
@@ -86,7 +90,7 @@ def convert_flavor(flavor):
     flavor_pb = oaktree_pb2.Flavor()
     convert_munch_to_pb(flavor, flavor_pb)
     for key, value in flavor.items():
-        flavor_pb.extra_specs[key] = str(value)
+        flavor_pb.properties[key] = str(value)
     return flavor_pb
 
 
@@ -97,6 +101,28 @@ def convert_flavors(flavors):
         # I feel like I'm doing something wrong
         flavor_list.flavors.extend([convert_flavor(flavor)])
     return flavor_list
+
+
+def convert_image(image):
+    image_pb = oaktree_pb2.Image()
+    tags = image.pop('tags', [])
+    for tag in tags:
+        image_pb.tags.append(str(tag))
+    convert_munch_to_pb(image, image_pb)
+    visibility = image.pop('visibility', 'private')
+    image_pb.is_public = (visibility == 'public')
+    for key, value in image.items():
+        image_pb.properties[key] = str(value)
+    return image_pb
+
+
+def convert_images(images):
+    image_list = oaktree_pb2.ImageList()
+    for image in images:
+        # Why does this require a list extend? That seems silly enough that
+        # I feel like I'm doing something wrong
+        image_list.images.extend([convert_image(image)])
+    return image_list
 
 
 class OaktreeServicer(oaktree_pb2.OaktreeServicer):
@@ -114,6 +140,23 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         cloud = _get_cloud(request)
         return convert_flavors(
             cloud.search_flavors(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+
+    def GetImage(self, request, context):
+        logging.info('getting image')
+        cloud = _get_cloud(request)
+        return convert_image(
+            cloud.get_image(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+    def SearchImages(self, request, context):
+        logging.info('searching images')
+        cloud = _get_cloud(request)
+        return convert_images(
+            cloud.search_images(
                 name_or_id=request.name_or_id,
                 filters=request.jmespath))
 

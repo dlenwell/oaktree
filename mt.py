@@ -13,3 +13,4 @@ flavor = stub.GetFlavor(
     oaktree_pb2.Filter(
         cloud_region=cloud,
         name_or_id='e82d0a5b-8031-4526-9a5d-a15f7b4d48ff'))
+images = stub.SearchImages(oaktree_pb2.Filter(cloud_region=cloud))
