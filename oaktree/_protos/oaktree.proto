@@ -23,11 +23,11 @@ option objc_class_prefix = "OAK";
 package oaktree;
 
 service Oaktree {
-  rpc GetFlavor (Flavor) returns (Flavor) {
+  rpc GetFlavor (Filter) returns (Flavor) {
   }
   rpc ListFlavors (ListFlavorsRequest) returns (FlavorList) {
   }
-  rpc SearchFlavors (JMESPath) returns (FlavorList) {
+  rpc SearchFlavors (Filter) returns (FlavorList) {
   }
 }
 
@@ -72,7 +72,8 @@ message FlavorList {
   repeated Flavor flavors = 1;
 }
 
-message JMESPath {
+message Filter {
   CloudRegion cloud_region = 1;
-  string path = 2;
+  string name_or_id = 2;
+  string jmespath = 3;
 }

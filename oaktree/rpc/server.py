@@ -86,6 +86,17 @@ def convert_flavors(flavors):
 
 class OaktreeServicer(oaktree_pb2.OaktreeServicer):
 
+    def GetFlavor(self, request, context):
+        logging.info('getting flavor')
+        cloud = _clouds._get_cloud(
+            cloud=request.cloud_region.cloud,
+            region=request.cloud_region.region,
+            project=request.cloud_region.project)
+        return convert_flavor(
+            cloud.get_flavor(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
     def ListFlavors(self, request, context):
         logging.info('listing flavors')
         cloud = _clouds._get_cloud(
@@ -93,6 +104,17 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
             region=request.cloud_region.region,
             project=request.cloud_region.project)
         return convert_flavors(cloud.list_flavors())
+
+    def SearchFlavors(self, request, context):
+        logging.info('searching flavors')
+        cloud = _clouds._get_cloud(
+            cloud=request.cloud_region.cloud,
+            region=request.cloud_region.region,
+            project=request.cloud_region.project)
+        return convert_flavors(
+            cloud.search_flavors(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
 
 
 def serve():

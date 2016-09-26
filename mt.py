@@ -9,3 +9,7 @@ cloud = oaktree_pb2.CloudRegion()
 cloud.cloud = 'vexxhost'
 
 flavors = stub.ListFlavors(oaktree_pb2.ListFlavorsRequest(cloud_region=cloud))
+flavor = stub.GetFlavor(
+    oaktree_pb2.Filter(
+        cloud_region=cloud,
+        name_or_id='e82d0a5b-8031-4526-9a5d-a15f7b4d48ff'))
