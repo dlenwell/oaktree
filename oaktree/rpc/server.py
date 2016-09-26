@@ -14,11 +14,9 @@
 # limitations under the License.
 
 import shade
-shade.simple_logging(debug=True)
 
 from concurrent import futures
 import logging
-logging.getLogger().setLevel(logging.INFO)
 import time
 
 from google.protobuf.descriptor import FieldDescriptor
@@ -98,6 +96,8 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
 
 
 def serve():
+    shade.simple_logging(debug=True)
+    logging.getLogger().setLevel(logging.INFO)
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     oaktree_pb2.add_OaktreeServicer_to_server(OaktreeServicer(), server)
     server.add_insecure_port('[::]:50051')
