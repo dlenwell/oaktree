@@ -25,8 +25,6 @@ package oaktree;
 service Oaktree {
   rpc GetFlavor (Filter) returns (Flavor) {
   }
-  rpc ListFlavors (ListFlavorsRequest) returns (FlavorList) {
-  }
   rpc SearchFlavors (Filter) returns (FlavorList) {
   }
 }
@@ -62,10 +60,6 @@ message Flavor {
   uint64 swap = 10;
   float rxtx_factor = 11;
   map<string, string> extra_specs = 99;
-}
-
-message ListFlavorsRequest {
-  CloudRegion cloud_region = 1;
 }
 
 message FlavorList {

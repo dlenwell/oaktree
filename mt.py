@@ -8,7 +8,7 @@ stub = oaktree_pb2.OaktreeStub(channel)
 cloud = oaktree_pb2.CloudRegion()
 cloud.cloud = 'vexxhost'
 
-flavors = stub.ListFlavors(oaktree_pb2.ListFlavorsRequest(cloud_region=cloud))
+flavors = stub.SearchFlavors(oaktree_pb2.Filter(cloud_region=cloud))
 flavor = stub.GetFlavor(
     oaktree_pb2.Filter(
         cloud_region=cloud,

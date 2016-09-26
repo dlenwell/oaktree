@@ -97,14 +97,6 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
                 name_or_id=request.name_or_id,
                 filters=request.jmespath))
 
-    def ListFlavors(self, request, context):
-        logging.info('listing flavors')
-        cloud = _clouds._get_cloud(
-            cloud=request.cloud_region.cloud,
-            region=request.cloud_region.region,
-            project=request.cloud_region.project)
-        return convert_flavors(cloud.list_flavors())
-
     def SearchFlavors(self, request, context):
         logging.info('searching flavors')
         cloud = _clouds._get_cloud(
