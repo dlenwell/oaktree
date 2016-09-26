@@ -43,6 +43,12 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 # Skipping bytes and enum for now
 
+def _get_cloud(request):
+    return _clouds._get_cloud(
+        cloud=request.cloud_region.cloud,
+        region=request.cloud_region.region,
+        project=request.cloud_region.project)
+
 
 def convert_for_field(value, field):
     if value is None:
@@ -88,10 +94,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
 
     def GetFlavor(self, request, context):
         logging.info('getting flavor')
-        cloud = _clouds._get_cloud(
-            cloud=request.cloud_region.cloud,
-            region=request.cloud_region.region,
-            project=request.cloud_region.project)
+        cloud = _get_cloud(request)
         return convert_flavor(
             cloud.get_flavor(
                 name_or_id=request.name_or_id,
@@ -99,10 +102,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
 
     def SearchFlavors(self, request, context):
         logging.info('searching flavors')
-        cloud = _clouds._get_cloud(
-            cloud=request.cloud_region.cloud,
-            region=request.cloud_region.region,
-            project=request.cloud_region.project)
+        cloud = _get_cloud(request)
         return convert_flavors(
             cloud.search_flavors(
                 name_or_id=request.name_or_id,
