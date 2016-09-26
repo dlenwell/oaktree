@@ -70,6 +70,9 @@ def convert_flavor(flavor):
     for key, value in flavor.items():
         if key == 'request_ids':
             continue
+        # TODO this will not work for neutron, but it's fine until then
+        if ':' in  key:
+            continue
         flavor_pb.extra_specs[key] = str(value)
     return flavor_pb
 

@@ -56,11 +56,12 @@ message Flavor {
   bool is_public = 4;
   bool disabled = 5;
   uint32 ram = 6;
-  uint32 cpus = 7;
+  uint32 vcpus = 7;
   uint64 disk = 8;
   uint32 ephemeral = 9;
   uint64 swap = 10;
-  map<string, string> extra_specs = 11;
+  float rxtx_factor = 11;
+  map<string, string> extra_specs = 99;
 }
 
 message ListFlavorsRequest {
