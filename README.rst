@@ -39,6 +39,23 @@ do things with it, you can just curl.
 
   curl -X GET -H 'Oaktree-API-Key: deadbeefdeadbeefdeadbeefdeadbeef' --header 'Accept: application/json' 'http://localhost:5000/clouds'
 
+If you want to try the gRPC version
+-----------------------------------
+
+In one window:
+
+.. code-block:: bash
+
+  python oaktree/rpc/server.py
+
+In another window:
+
+.. code-block:: bash
+
+  python -i mt.py
+
+You'll have a flavors object you can poke at.
+
 Shape of the Project
 --------------------
 

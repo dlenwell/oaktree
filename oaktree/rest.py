@@ -21,30 +21,18 @@ import flask_restplus
 import os_client_config
 import shade
 
+from oaktree import _clouds
 from oaktree.auth import authentication
 
 
 app = flask.Flask(__name__)
 api = flask_restplus.Api(app, authorizations=authentication.authorizations)
-all_clouds = {}
 CLOUD_API = shade.OpenStackCloud.__dict__.keys()
 C_PREFIX = '/cloud/<string:cloud>'
 CR_PREFIX = '/cloud/<string:cloud>/region/<string:region>'
 openstack_config = os_client_config.OpenStackConfig()
 
 #authentication.LOGIN_MANAGER.init_app(app)
-
-
-def _make_cloud_key(cloud, region):
-    return "{cloud}:{region}".format(cloud=cloud, region=region)
-
-
-def _get_cloud(cloud, region):
-    key = _make_cloud_key(cloud, region)
-    if key not in all_clouds:
-        all_clouds[key] = shade.openstack_cloud(
-            cloud=cloud, region_name=region, debug=True)
-    return all_clouds[key]
 
 
 #@api.header(authentication.API_KEY_HEADER, authentication.API_KEY_HEADER_DESC,
@@ -75,7 +63,7 @@ def make_list_resource(name):
     class RestResource(flask_restplus.Resource):
         #@login.login_required
         def get(self, cloud='vexxhost', region=None, **kwargs):
-            cloud_obj = _get_cloud(cloud, region)
+            cloud_obj = _clouds._get_cloud(cloud, region)
             filters = flask.request.args
             if filters:
                 search_key = name.replace('list', 'search')
@@ -93,7 +81,7 @@ def make_get_resource(name):
     class RestResource(flask_restplus.Resource):
         #@login.login_required
         def get(self, name_or_id, cloud='vexxhost', region=None):
-            cloud_obj = _get_cloud(cloud, region)
+            cloud_obj = _clouds._get_cloud(cloud, region)
             filters = flask.request.args
             get_method = getattr(cloud_obj, name)
             if filters:
