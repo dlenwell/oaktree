@@ -38,6 +38,7 @@ _INT_TYPES = (
 _FLOAT_TYPES = (
     FieldDescriptor.TYPE_DOUBLE, FieldDescriptor.TYPE_FLOAT,
 )
+_FIELDS_TO_STRIP = ('request_ids', 'HUMAN_ID', 'NAME_ATTR', 'human_id')
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -65,18 +66,26 @@ def convert_for_field(value, field):
         return float(value)
 
 
-def convert_flavor(flavor):
-    flavor_pb = oaktree_pb2.Flavor()
-    for key, field in flavor_pb.DESCRIPTOR.fields_by_name.items():
-        value = convert_for_field(flavor.pop(key, None), field)
+def convert_munch_to_pb(munch, pb):
+    for key, field in pb.DESCRIPTOR.fields_by_name.items():
+        value = convert_for_field(munch.pop(key, None), field)
         if value:
-            setattr(flavor_pb, key, value)
-    for key, value in flavor.items():
-        if key == 'request_ids':
-            continue
+            setattr(pb, key, value)
+    to_strip = set()
+    for key, value in munch.items():
+        if key in _FIELDS_TO_STRIP:
+            to_strip.add(key)
         # TODO this will not work for neutron, but it's fine until then
         if ':' in  key:
-            continue
+            to_strip.add(key)
+    for key in to_strip:
+        munch.pop(key)
+
+
+def convert_flavor(flavor):
+    flavor_pb = oaktree_pb2.Flavor()
+    convert_munch_to_pb(flavor, flavor_pb)
+    for key, value in flavor.items():
         flavor_pb.extra_specs[key] = str(value)
     return flavor_pb
 
