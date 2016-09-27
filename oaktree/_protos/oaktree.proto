@@ -20,10 +20,6 @@ option java_package = "org.openstack.infra.oaktree";
 option java_outer_classname = "OaktreeProto";
 option objc_class_prefix = "OAK";
 
-import "common.proto";
-import "flavor.proto";
-import "image.proto";
-
 package oaktree;
 
 service Oaktree {
@@ -31,4 +27,82 @@ service Oaktree {
   rpc SearchFlavors (Filter) returns (FlavorList) {}
   rpc GetImage (Filter) returns (Image) {}
   rpc SearchImages (Filter) returns (ImageList) {}
+}
+
+message Project {
+  oneof project {
+    string id = 1;
+    string name = 2;
+  }
+  oneof domain {
+    string domain_id = 3;
+    string domain_name = 4;
+  }
+}
+
+message Location {
+  string cloud = 1;
+  string region = 2;
+  string zone = 3;
+  Project project = 4;
+}
+
+message Filter {
+  Location location = 1;
+  string name_or_id = 2;
+  string jmespath = 3;
+}
+
+
+message Flavor {
+  Location location = 1;
+  string id = 2;
+  string name = 3;
+  bool is_public = 4;
+  bool disabled = 5;
+  uint32 ram = 6;
+  uint32 vcpus = 7;
+  uint64 disk = 8;
+  uint32 ephemeral = 9;
+  uint64 swap = 10;
+  float rxtx_factor = 11;
+  map<string, string> properties = 99;
+}
+
+message FlavorList {
+  repeated Flavor flavors = 1;
+}
+
+message Image {
+  Location location = 1;
+  string id = 2;
+  string name = 3;
+  uint32 min_ram = 4;
+  uint64 min_disk = 5;
+  uint64 size = 6;
+  uint64 virtual_size = 7;  // enum?
+  string container_format = 8;  // enum?
+  string disk_format = 9;
+  string checksum = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  string owner = 13;
+  bool is_public = 14;  // visibility=public - fix in shade
+  bool is_protected = 15;
+  enum Status {
+    active = 0;
+    queued = 1;
+    saving = 2;
+    deleted = 3;
+    killed = 4;
+    pending_delete = 5;
+    deactivated = 6;
+  }
+  Status status = 16;
+  repeated string tags = 17;
+  map<string, string> properties = 99;
+}
+
+message ImageList {
+  repeated Image images = 1;
 }
