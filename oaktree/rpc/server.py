@@ -25,8 +25,7 @@ from grpc.framework.foundation import logging_pool
 
 from oaktree import _clouds
 from oaktree.rpc import oaktree_pb2
-from oaktree.rpc import flavor_pb2
-from oaktree.rpc import image_pb2
+from oaktree.rpc import model
 
 _BOOL_TYPES = (FieldDescriptor.TYPE_BOOL,)
 _ENUM_TYPES = (FieldDescriptor.TYPE_ENUM, )
@@ -89,7 +88,7 @@ def convert_munch_to_pb(munch, pb):
 
 
 def convert_flavor(flavor):
-    flavor_pb = flavor_pb2.Flavor()
+    flavor_pb = model.Flavor()
     convert_munch_to_pb(flavor, flavor_pb)
     for key, value in flavor.items():
         flavor_pb.properties[key] = str(value)
@@ -97,7 +96,7 @@ def convert_flavor(flavor):
 
 
 def convert_flavors(flavors):
-    flavor_list = flavor_pb2.FlavorList()
+    flavor_list = model.FlavorList()
     for flavor in flavors:
         # Why does this require a list extend? That seems silly enough that
         # I feel like I'm doing something wrong
@@ -106,7 +105,7 @@ def convert_flavors(flavors):
 
 
 def convert_image(image):
-    image_pb = image_pb2.Image()
+    image_pb = model.Image()
     tags = image.pop('tags', [])
     for tag in tags:
         image_pb.tags.append(str(tag))
@@ -119,7 +118,7 @@ def convert_image(image):
 
 
 def convert_images(images):
-    image_list = image_pb2.ImageList()
+    image_list = model.ImageList()
     for image in images:
         # Why does this require a list extend? That seems silly enough that
         # I feel like I'm doing something wrong
