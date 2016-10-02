@@ -29,13 +29,17 @@ def _build_proto():
     proto_path = os.path.join(base_path, '_protos')
     rpc_path = os.path.join(base_path, 'rpc')
     protoc.main(
-        (
+        [
             '',
             '-I{proto_path}'.format(proto_path=proto_path),
             '--python_out={rpc_path}'.format(rpc_path=rpc_path),
             '--grpc_python_out={rpc_path}'.format(rpc_path=rpc_path),
-            '{proto_path}/oaktree.proto'.format(proto_path=proto_path),
-        )
+        ] + [
+            '{proto_path}/{proto}'.format(
+                proto_path=proto_path, proto=proto)
+            for proto in os.listdir(proto_path)
+            if proto.endswith('.proto')
+        ]
     )
 
 

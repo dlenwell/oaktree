@@ -25,6 +25,8 @@ from grpc.framework.foundation import logging_pool
 
 from oaktree import _clouds
 from oaktree.rpc import oaktree_pb2
+from oaktree.rpc import flavor_pb2
+from oaktree.rpc import image_pb2
 
 _BOOL_TYPES = (FieldDescriptor.TYPE_BOOL,)
 _ENUM_TYPES = (FieldDescriptor.TYPE_ENUM, )
@@ -86,26 +88,25 @@ def convert_munch_to_pb(munch, pb):
         munch.pop(key)
 
 
-def convert_flavor(flavor, location):
-    flavor_pb = oaktree_pb2.Flavor()
+def convert_flavor(flavor):
+    flavor_pb = flavor_pb2.Flavor()
     convert_munch_to_pb(flavor, flavor_pb)
     for key, value in flavor.items():
         flavor_pb.properties[key] = str(value)
-    flavor_pb.location.MergeFrom(location)
     return flavor_pb
 
 
-def convert_flavors(flavors, location):
-    flavor_list = oaktree_pb2.FlavorList()
+def convert_flavors(flavors):
+    flavor_list = flavor_pb2.FlavorList()
     for flavor in flavors:
         # Why does this require a list extend? That seems silly enough that
         # I feel like I'm doing something wrong
-        flavor_list.flavors.extend([convert_flavor(flavor, location)])
+        flavor_list.flavors.extend([convert_flavor(flavor)])
     return flavor_list
 
 
-def convert_image(image, location):
-    image_pb = oaktree_pb2.Image()
+def convert_image(image):
+    image_pb = image_pb2.Image()
     tags = image.pop('tags', [])
     for tag in tags:
         image_pb.tags.append(str(tag))
@@ -114,16 +115,15 @@ def convert_image(image, location):
     image_pb.is_public = (visibility == 'public')
     for key, value in image.items():
         image_pb.properties[key] = str(value)
-    image_pb.location.MergeFrom(location)
     return image_pb
 
 
-def convert_images(images, location):
-    image_list = oaktree_pb2.ImageList()
+def convert_images(images):
+    image_list = image_pb2.ImageList()
     for image in images:
         # Why does this require a list extend? That seems silly enough that
         # I feel like I'm doing something wrong
-        image_list.images.extend([convert_image(image, location)])
+        image_list.images.extend([convert_image(image)])
     return image_list
 
 
@@ -135,8 +135,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         return convert_flavor(
             cloud.get_flavor(
                 name_or_id=request.name_or_id,
-                filters=request.jmespath),
-            request.location)
+                filters=request.jmespath))
 
     def SearchFlavors(self, request, context):
         logging.info('searching flavors')
@@ -144,8 +143,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         return convert_flavors(
             cloud.search_flavors(
                 name_or_id=request.name_or_id,
-                filters=request.jmespath),
-            request.location)
+                filters=request.jmespath))
 
 
     def GetImage(self, request, context):
@@ -154,8 +152,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         return convert_image(
             cloud.get_image(
                 name_or_id=request.name_or_id,
-                filters=request.jmespath),
-            request.location)
+                filters=request.jmespath))
 
     def SearchImages(self, request, context):
         logging.info('searching images')
@@ -163,8 +160,7 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         return convert_images(
             cloud.search_images(
                 name_or_id=request.name_or_id,
-                filters=request.jmespath),
-            request.location)
+                filters=request.jmespath))
 
 
 def serve():

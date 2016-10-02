@@ -1,4 +1,4 @@
-// Copyright (c) Red Hat, Inc
+// Copyright (c) 2016 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,20 +15,29 @@
 
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "org.openstack.infra.oaktree";
-option java_outer_classname = "OaktreeProto";
-option objc_class_prefix = "OAK";
-
-import "common.proto";
-import "flavor.proto";
-import "image.proto";
-
 package oaktree;
 
-service Oaktree {
-  rpc GetFlavor (Filter) returns (Flavor) {}
-  rpc SearchFlavors (Filter) returns (FlavorList) {}
-  rpc GetImage (Filter) returns (Image) {}
-  rpc SearchImages (Filter) returns (ImageList) {}
+message Project {
+  oneof project {
+    string id = 1;
+    string name = 2;
+  }
+  oneof domain {
+    string domain_id = 3;
+    string domain_name = 4;
+  }
 }
+
+message Location {
+  string cloud = 1;
+  string region = 2;
+  string zone = 3;
+  Project project = 4;
+}
+
+message Filter {
+  Location location = 1;
+  string name_or_id = 2;
+  string jmespath = 3;
+}
+
