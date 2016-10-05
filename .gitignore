@@ -54,4 +54,4 @@ ChangeLog
 .*sw?
 
 # Protobuf Generated Files
-oaktree/rpc/oaktree_pb2.py
+oaktree/rpc/*_pb2.py
