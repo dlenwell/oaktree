@@ -16,7 +16,6 @@
 import inspect
 
 import flask
-#from flask.ext import login
 import flask_restplus
 import os_client_config
 import shade
@@ -32,13 +31,8 @@ C_PREFIX = '/cloud/<string:cloud>'
 CR_PREFIX = '/cloud/<string:cloud>/region/<string:region>'
 openstack_config = os_client_config.OpenStackConfig()
 
-#authentication.LOGIN_MANAGER.init_app(app)
 
-
-#@api.header(authentication.API_KEY_HEADER, authentication.API_KEY_HEADER_DESC,
-#            required=True)
 class CloudConfig(flask_restplus.Resource):
-    #@login.login_required
     def get(self, cloud=None, region=None):
         if not cloud and not region:
             return [
@@ -57,11 +51,7 @@ api.add_resource(
 
 
 def make_list_resource(name):
-    #@api.header(authentication.API_KEY_HEADER,
-    #            authentication.API_KEY_HEADER_DESC,
-    #            required=True)
     class RestResource(flask_restplus.Resource):
-        #@login.login_required
         def get(self, cloud='vexxhost', region=None, **kwargs):
             cloud_obj = _clouds._get_cloud(cloud, region)
             filters = flask.request.args
@@ -75,11 +65,7 @@ def make_list_resource(name):
 
 
 def make_get_resource(name):
-    #@api.header(authentication.API_KEY_HEADER,
-    #            authentication.API_KEY_HEADER_DESC,
-    #            required=True)
     class RestResource(flask_restplus.Resource):
-        #@login.login_required
         def get(self, name_or_id, cloud='vexxhost', region=None):
             cloud_obj = _clouds._get_cloud(cloud, region)
             filters = flask.request.args

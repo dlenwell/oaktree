@@ -21,12 +21,12 @@ import time
 
 from google.protobuf.descriptor import FieldDescriptor
 import grpc
-from grpc.framework.foundation import logging_pool
 
 from oaktree import _clouds
-from oaktree.rpc import oaktree_pb2
 from oaktree.rpc import model
+from oaktree.rpc import oaktree_pb2
 
+# Skipping bytes for now
 _BOOL_TYPES = (FieldDescriptor.TYPE_BOOL,)
 _ENUM_TYPES = (FieldDescriptor.TYPE_ENUM, )
 _STR_TYPES = (FieldDescriptor.TYPE_STRING, )
@@ -41,11 +41,8 @@ _FLOAT_TYPES = (
     FieldDescriptor.TYPE_DOUBLE, FieldDescriptor.TYPE_FLOAT,
 )
 _FIELDS_TO_STRIP = ('request_ids', 'HUMAN_ID', 'NAME_ATTR', 'human_id')
-
-
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-# Skipping bytes for now
 
 def _get_cloud(request):
     return _clouds._get_cloud(
@@ -80,8 +77,8 @@ def convert_munch_to_pb(munch, pb):
     for key, value in munch.items():
         if key in _FIELDS_TO_STRIP:
             to_strip.add(key)
-        # TODO this will not work for neutron, but it's fine until then
-        if ':' in  key:
+        # TODO(mordred) this will not work for neutron, but it's fine til then
+        if ':' in key:
             to_strip.add(key)
     for key in to_strip:
         munch.pop(key)
@@ -173,7 +170,6 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
             cloud.search_flavors(
                 name_or_id=request.name_or_id,
                 filters=request.jmespath))
-
 
     def GetImage(self, request, context):
         logging.info('getting image')

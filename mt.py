@@ -1,3 +1,4 @@
+# flake8: noqa
 import grpc
 
 from oaktree.rpc import model

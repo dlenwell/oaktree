@@ -16,13 +16,14 @@
 # This is totes cheating - but at the moment I don't particularly care
 def _try_import():
     try:
-        import oaktree.rpc.oaktree_pb2
+        import oaktree.rpc.model  # noqa
     except ImportError:
         _build_proto()
 
 
 def _build_proto():
     import os
+
     from grpc.tools import protoc
 
     base_path = os.path.abspath(os.path.dirname(__file__))
