@@ -1,6 +1,6 @@
 import grpc
 
-from oaktree.rpc import common_pb2
+from oaktree.rpc import model
 from oaktree.rpc import oaktree_pb2
 
 channel = grpc.insecure_channel('localhost:50051')

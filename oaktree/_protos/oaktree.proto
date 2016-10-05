@@ -23,6 +23,7 @@ option objc_class_prefix = "OAK";
 import "common.proto";
 import "flavor.proto";
 import "image.proto";
+import "security_group.proto";
 
 package oaktree;
 
@@ -31,4 +32,8 @@ service Oaktree {
   rpc SearchFlavors (Filter) returns (FlavorList) {}
   rpc GetImage (Filter) returns (Image) {}
   rpc SearchImages (Filter) returns (ImageList) {}
+  rpc GetSecurityGroup (Filter) returns (SecurityGroup) {}
+  rpc SearchSecurityGroups (Filter) returns (SecurityGroupList) {}
+  rpc GetSecurityGroupRule (Filter) returns (SecurityGroupRule) {}
+  rpc SearchSecurityGroupRules (Filter) returns (SecurityGroupRuleList) {}
 }

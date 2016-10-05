@@ -126,6 +126,36 @@ def convert_images(images):
     return image_list
 
 
+def convert_security_groups(security_groups):
+    security_group_list = model.SecurityGroupList()
+    for security_group in security_groups:
+        security_group_list.extend([convert_security_group(security_group)])
+    return security_group_list
+
+
+def convert_security_group(security_group):
+    secgroup_pb = model.SecurityGroup()
+    rules = security_group.pop('security_group_rules', [])
+    convert_munch_to_pb(security_group, secgroup_pb)
+    for rule in rules:
+        secgroup_pb.rules.append(convert_security_group_rule(rule))
+
+
+def convert_security_group_rules(security_group_rules):
+    security_group_rule_list = model.SecurityGroupRuleList()
+    rules = []
+    for security_group_rule in security_group_rules:
+        rules.append(convert_security_group_rule(security_group_rule))
+    security_group_rule_list.extend(rules)
+    return security_group_rule_list
+
+
+def convert_security_group_rule(security_group_rule):
+    secgroup_rule_pb = model.SecurityGroupRule()
+    convert_munch_to_pb(security_group_rule, secgroup_rule_pb)
+    return secgroup_rule_pb
+
+
 class OaktreeServicer(oaktree_pb2.OaktreeServicer):
 
     def GetFlavor(self, request, context):
@@ -158,6 +188,38 @@ class OaktreeServicer(oaktree_pb2.OaktreeServicer):
         cloud = _get_cloud(request)
         return convert_images(
             cloud.search_images(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+    def GetSecurityGroup(self, request, context):
+        logging.info('getting security group')
+        cloud = _get_cloud(request)
+        return convert_security_group(
+            cloud.get_security_group(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+    def SearchSecurityGroups(self, request, context):
+        logging.info('searching security groups')
+        cloud = _get_cloud(request)
+        return convert_security_groups(
+            cloud.search_security_groups(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+    def GetSecurityGroupRule(self, request, context):
+        logging.info('getting security group rule')
+        cloud = _get_cloud(request)
+        return convert_security_group_rule(
+            cloud.get_security_group_rule(
+                name_or_id=request.name_or_id,
+                filters=request.jmespath))
+
+    def SearchSecurityGroupRules(self, request, context):
+        logging.info('searching security group rules')
+        cloud = _get_cloud(request)
+        return convert_security_group_rules(
+            cloud.search_security_group_rules(
                 name_or_id=request.name_or_id,
                 filters=request.jmespath))
 
