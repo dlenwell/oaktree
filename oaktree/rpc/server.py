@@ -69,6 +69,9 @@ def convert_for_field(value, field):
 
 
 def convert_munch_to_pb(munch, pb):
+    for key, value in munch.properties.items():
+        pb.properties[key] = str(value)
+    munch.pop('properties')
     for key, field in pb.DESCRIPTOR.fields_by_name.items():
         value = convert_for_field(munch.pop(key, None), field)
         if value:
@@ -87,8 +90,8 @@ def convert_munch_to_pb(munch, pb):
 def convert_flavor(flavor):
     flavor_pb = model.Flavor()
     convert_munch_to_pb(flavor, flavor_pb)
-    for key, value in flavor.items():
-        flavor_pb.properties[key] = str(value)
+    for key, value in flavor.extra_specs.items():
+        flavor_pb.properties.setdefault(key, str(value))
     return flavor_pb
 
 
@@ -107,10 +110,6 @@ def convert_image(image):
     for tag in tags:
         image_pb.tags.append(str(tag))
     convert_munch_to_pb(image, image_pb)
-    visibility = image.pop('visibility', 'private')
-    image_pb.is_public = (visibility == 'public')
-    for key, value in image.items():
-        image_pb.properties[key] = str(value)
     return image_pb
 
 
@@ -139,12 +138,20 @@ def convert_security_group(security_group):
 
 
 def convert_security_group_rules(security_group_rules):
-    security_group_rule_list = model.SecurityGroupRuleList()
-    rules = []
-    for security_group_rule in security_group_rules:
-        rules.append(convert_security_group_rule(security_group_rule))
-    security_group_rule_list.extend(rules)
-    return security_group_rule_list
+    return _convert_dicts(
+        security_group_rules,
+        model.SecurityGroupRuleList,
+        convert_security_group_rule,
+        'rules')
+
+
+def _convert_dicts(dicts, list_class, convert_function, attrname):
+    pb_list = list_class()
+    items = []
+    for item in dicts:
+        items.append(convert_function(item))
+    getattr(pb_list, attrname).extend(items)
+    return pb_list
 
 
 def convert_security_group_rule(security_group_rule):

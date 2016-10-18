@@ -47,5 +47,5 @@ def _get_cloud(cloud, region, project=None):
     if key not in all_clouds:
         all_clouds[key] = shade.openstack_cloud(
             cloud=cloud, region_name=region,
-            debug=True, **kwargs)
+            debug=True, strict=True, **kwargs)
     return all_clouds[key]

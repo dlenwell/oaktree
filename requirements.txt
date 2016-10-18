@@ -3,5 +3,5 @@
 # process, which may cause wedges in the gate later.
 
 pbr>=1.6
-shade
+shade>=1.13.0
 grpc

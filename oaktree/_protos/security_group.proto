@@ -33,6 +33,8 @@ message SecurityGroupRule {
   string protocol = 7;
   string remote_ip_prefix = 8;
   string security_group_id = 9;
+  string remote_group_id = 10;
+  map<string, string> properties = 99;
 }
 
 message SecurityGroupRuleList {
@@ -42,8 +44,10 @@ message SecurityGroupRuleList {
 message SecurityGroup {
   Location location = 1;
   string id = 2;
-  string description = 3;
-  repeated SecurityGroupRule rules = 4;
+  string name = 3;
+  string description = 4;
+  repeated SecurityGroupRule rules = 5;
+  map<string, string> properties = 99;
 }
 
 message SecurityGroupList {

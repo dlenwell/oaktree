@@ -26,14 +26,34 @@ message Image {
   uint32 min_ram = 4;
   uint64 min_disk = 5;
   uint64 size = 6;
-  uint64 virtual_size = 7;  // enum?
-  string container_format = 8;  // enum?
-  string disk_format = 9;
+  uint64 virtual_size = 7;
+  enum ContainerFormat {
+    bare = 0;
+    docker = 1;
+    ovf = 2;
+    ova = 3;
+    ami = 4;
+    ari = 5;
+    aki = 6;
+  }
+  ConatinerFormat container_format = 8;
+  DiskFormat {
+    qcow2 = 0;
+    raw = 1;
+    vhd = 2;
+    iso = 3;
+    vmdk = 4;
+    vdi = 5;
+    ami = 6;
+    ari = 7;
+    aki = 8;
+  }
+  DiskFormat disk_format = 9;
   string checksum = 10;
   string created_at = 11;
   string updated_at = 12;
   string owner = 13;
-  bool is_public = 14;  // visibility=public - fix in shade
+  bool is_public = 14;
   bool is_protected = 15;
   enum Status {
     active = 0;
@@ -45,7 +65,9 @@ message Image {
     deactivated = 6;
   }
   Status status = 16;
-  repeated string tags = 17;
+  repeated string locations = 17;
+  string direct_url = 18;
+  repeated string tags = 19;
   map<string, string> properties = 99;
 }
 
